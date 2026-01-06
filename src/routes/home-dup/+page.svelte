@@ -54,7 +54,7 @@
         window.initEmbeddables()
     </script>
 
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/basil/stripe.js"></script>
 </svelte:head>
 
 <savvy id="flow_5e8j438g43g77564i11j7f02j3"></savvy>
