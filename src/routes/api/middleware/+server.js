@@ -75,3 +75,41 @@ export async function POST({ request }) {
         return error(500, 'Internal server error');
     }
 }
+
+export async function PUT({ request }) {
+    try {
+        const { userId, email, fullName } = await request.json();
+
+        if (!userId) {
+            return error(400, 'userId is required');
+        }
+
+        const engageData = {
+            $token: 'df65aa0866129f40cc97ca11a1b58035',
+            $distinct_id: userId,
+            $set: {
+                $email: email,
+                $name: fullName
+            }
+        };
+
+        const response = await fetch('https://api.mixpanel.com/engage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([engageData])
+        });
+
+        if (!response.ok) {
+            console.error('Mixpanel engage error:', response.status, response.statusText);
+            return error(500, 'Failed to set user properties');
+        }
+
+        return json({ success: true, message: 'User properties set successfully' });
+
+    } catch (err) {
+        console.error('Engage middleware error:', err);
+        return error(500, 'Internal server error');
+    }
+}
