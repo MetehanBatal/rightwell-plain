@@ -68,7 +68,7 @@ export async function POST({ request }) {
             return error(500, 'Failed to send event to Mixpanel');
         }
 
-        return json({ success: true, message: 'Event sent successfully', fullData: JSON.stringify(response) });
+        return json({ success: true, message: 'Event sent successfully', fullData: JSON.stringify(response) }); 
 
     } catch (err) {
         console.error('Middleware error:', err);
