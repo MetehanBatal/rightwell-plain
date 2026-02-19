@@ -55,4 +55,4 @@
     <script src="https://js.stripe.com/basil/stripe.js"></script>
 </svelte:head>
 
-<savvy id="flow_5e8j438g43g77564i11j7f02j3" lp="landing_page_v3" partner="nift"></savvy>
+<savvy id="flow_5e8j438g43g77564i11j7f02j3" lp="landing_page_v2" partner="nift"></savvy>
