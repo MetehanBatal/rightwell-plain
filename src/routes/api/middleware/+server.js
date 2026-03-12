@@ -37,15 +37,27 @@ export async function GET({ url }) {
         const utmTerm = url.searchParams.get('utmTerm');
         const utmContent = url.searchParams.get('utmContent');
 
-        // Build profile properties with standard MixPanel naming
-        const profileProperties = {};
-        if (utmSource) profileProperties['utm_source'] = utmSource;
-        if (utmMedium) profileProperties['utm_medium'] = utmMedium;
-        if (utmCampaign) profileProperties['utm_campaign'] = utmCampaign;
-        if (utmTerm) profileProperties['utm_term'] = utmTerm;
-        if (utmContent) profileProperties['utm_content'] = utmContent;
+        // Extract additional profile parameters
+        const email = url.searchParams.get('email');
+        const browser = url.searchParams.get('browser');
+        const browserVersion = url.searchParams.get('browserVersion');
+        const referrer = url.searchParams.get('referrer');
+        const referringDomain = url.searchParams.get('referringDomain');
 
-        // Set UTM profile properties if any exist (using $set_once for first-touch attribution)
+        // Build profile properties with MixPanel reserved naming
+        const profileProperties = {};
+        if (utmSource) profileProperties['$initial_utm_source'] = utmSource;
+        if (utmMedium) profileProperties['$initial_utm_medium'] = utmMedium;
+        if (utmCampaign) profileProperties['$initial_utm_campaign'] = utmCampaign;
+        if (utmTerm) profileProperties['$initial_utm_term'] = utmTerm;
+        if (utmContent) profileProperties['$initial_utm_content'] = utmContent;
+        if (email) profileProperties['$email'] = email;
+        if (browser) profileProperties['$browser'] = browser;
+        if (browserVersion) profileProperties['$browser_version'] = browserVersion;
+        if (referrer) profileProperties['$initial_referrer'] = referrer;
+        if (referringDomain) profileProperties['$initial_referring_domain'] = referringDomain;
+
+        // Set profile properties if any exist (using $set_once for first-touch attribution)
         if (Object.keys(profileProperties).length > 0) {
             const engageData = {
                 $token: 'df65aa0866129f40cc97ca11a1b58035',
