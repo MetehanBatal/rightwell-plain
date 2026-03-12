@@ -17,7 +17,7 @@ export async function GET({ url }) {
             }
         };
 
-        const response = await fetch('https://api.mixpanel.com/track', {
+        const identifyResponse = await fetch('https://api.mixpanel.com/track', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -25,9 +25,45 @@ export async function GET({ url }) {
             body: JSON.stringify([identifyData])
         });
 
-        if (!response.ok) {
-            console.error('Identify error:', response.status, response.statusText);
+        if (!identifyResponse.ok) {
+            console.error('Identify error:', identifyResponse.status, identifyResponse.statusText);
             return error(500, 'Failed to identify user');
+        }
+
+        // Extract UTM parameters from query string
+        const utmSource = url.searchParams.get('utmSource');
+        const utmMedium = url.searchParams.get('utmMedium');
+        const utmCampaign = url.searchParams.get('utmCampaign');
+        const utmTerm = url.searchParams.get('utmTerm');
+        const utmContent = url.searchParams.get('utmContent');
+
+        // Build profile properties with standard MixPanel naming
+        const profileProperties = {};
+        if (utmSource) profileProperties['utm_source'] = utmSource;
+        if (utmMedium) profileProperties['utm_medium'] = utmMedium;
+        if (utmCampaign) profileProperties['utm_campaign'] = utmCampaign;
+        if (utmTerm) profileProperties['utm_term'] = utmTerm;
+        if (utmContent) profileProperties['utm_content'] = utmContent;
+
+        // Set UTM profile properties if any exist (using $set_once for first-touch attribution)
+        if (Object.keys(profileProperties).length > 0) {
+            const engageData = {
+                $token: 'df65aa0866129f40cc97ca11a1b58035',
+                $distinct_id: userId,
+                $set_once: profileProperties
+            };
+
+            const engageResponse = await fetch('https://api.mixpanel.com/engage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([engageData])
+            });
+
+            if (!engageResponse.ok) {
+                console.error('UTM profile set error:', engageResponse.status);
+            }
         }
 
         return json({ success: true, message: 'success!' });
